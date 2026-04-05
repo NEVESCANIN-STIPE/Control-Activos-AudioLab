@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Home } from './components/home'; //Checar porque home funciona y no Home
+import { Home } from './components/Home'; //Checar porque home funciona y no Home
 import { Inventory } from './components/Inventory';
 import { ManualRegistration } from './components/ManualRegistration';
 import { EditAsset } from './components/EditAsset';
