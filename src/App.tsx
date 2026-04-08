@@ -1,12 +1,32 @@
 import { useState } from 'react';
-import { Home } from './components/Home'; //Checar porque home funciona y no Home
+import { Home } from './components/Home';
 import { Inventory } from './components/Inventory';
 import { ManualRegistration } from './components/ManualRegistration';
 import { EditAsset } from './components/EditAsset';
 import { TechnicalStates } from './components/TechnicalStates';
 import { FixedAssets } from './components/FixedAssets';
 import { AssetHistory } from './components/AssetHistory';
-import type{ Asset, TechnicalState } from './types';
+import './styles/globals.css';
+
+export type Asset = {
+  id: string;
+  code: string;
+  name: string;
+  location: string;
+  technician: string;
+  category: string;
+  image?: string;
+  description?: string;
+  department?: string;
+  technicalState?: string;
+  createdAt: Date;
+};
+
+export type TechnicalState = {
+  id: string;
+  state: string;
+  technician: string;
+};
 
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'home' | 'inventory' | 'manual-registration' | 'edit-asset' | 'technical-states' | 'fixed-assets' | 'history'>('home');
