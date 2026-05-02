@@ -6,6 +6,8 @@ import { EditAsset } from './components/EditAsset';
 import { TechnicalStates } from './components/TechnicalStates';
 import { FixedAssets } from './components/FixedAssets';
 import { AssetHistory } from './components/AssetHistory';
+import { useEffect } from "react";
+import { getAssets } from "./services/api";
 import './styles/globals.css';
 
 export type Asset = {
