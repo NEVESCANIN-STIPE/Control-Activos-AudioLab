@@ -1,4 +1,5 @@
-import { Search, Tv, Beaker, MonitorSmartphone, BookOpen, Briefcase, Warehouse, Plus } from 'lucide-react';
+import { Search, Tv, Beaker, MonitorSmartphone, BookOpen, Briefcase, Warehouse, Plus, Building2,       // 👈 agregar
+  FlaskConical   } from 'lucide-react';
 
 type HomeProps = {
   onCategorySelect: (category: string) => void;
@@ -7,11 +8,11 @@ type HomeProps = {
 export function Home({ onCategorySelect }: HomeProps) {
   const categories = [
     { name: 'Audiovisuales', icon: Tv, color: 'bg-blue-500' },
-    { name: 'Laboratorio', icon: Beaker, color: 'bg-purple-500' },
-    { name: 'Kioskos', icon: MonitorSmartphone, color: 'bg-green-500' },
-    { name: 'Libros', icon: BookOpen, color: 'bg-yellow-500' },
-    { name: 'Activos Fijos', icon: Briefcase, color: 'bg-red-500' },
-    { name: 'Almacén', icon: Warehouse, color: 'bg-indigo-500' },
+    { name: 'Almacen-laboratorios', icon: Warehouse, color: 'bg-purple-500' },
+    { name: 'Laboratorios', icon: Beaker, color: 'bg-green-500' },
+    { name: 'Oficina Rab-Lav', icon: Building2, color: 'bg-yellow-500' },
+    { name: 'Activos fijos(generales)', icon: Briefcase, color: 'bg-red-500' }, 
+    { name: 'Almacen(CEI)', icon: FlaskConical, color: 'bg-indigo-500' },
   ];
 
   return (

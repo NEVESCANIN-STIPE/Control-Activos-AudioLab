@@ -9,6 +9,7 @@ import { AssetHistory } from './components/AssetHistory';
 import { useEffect } from "react";
 import { getAssets } from "./services/api";
 import './styles/globals.css';
+import { ScanPage } from "./pages/ScanPage";
 
 export type Asset = {
   id: string;
@@ -31,45 +32,10 @@ export type TechnicalState = {
 };
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'home' | 'inventory' | 'manual-registration' | 'edit-asset' | 'technical-states' | 'fixed-assets' | 'history'>('home');
+  const [currentScreen, setCurrentScreen] = useState<'home' | 'inventory' | 'manual-registration' | 'edit-asset' | 'technical-states' | 'fixed-assets' | 'history' | 'scan'>('home');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [assets, setAssets] = useState<Asset[]>([
-    {
-      id: '1',
-      code: 'AUD-001',
-      name: 'Proyector Epson',
-      location: 'Sala de conferencias A',
-      technician: 'Carlos Mendoza',
-      category: 'Audiovisuales',
-      description: 'Proyector HD 1080p',
-      department: 'Administración',
-      technicalState: 'Operativo',
-      createdAt: new Date('2024-01-15'),
-    },
-    {
-      id: '2',
-      code: 'LAB-045',
-      name: 'Microscopio Digital',
-      location: 'Laboratorio 3',
-      technician: 'Ana García',
-      category: 'Laboratorio',
-      description: 'Microscopio con cámara integrada',
-      department: 'Ciencias',
-      technicalState: 'En mantenimiento',
-      createdAt: new Date('2024-02-20'),
-    },
-    {
-      id: '3',
-      code: 'KIO-012',
-      name: 'Tablet Samsung',
-      location: 'Kiosko Principal',
-      technician: 'Roberto Silva',
-      category: 'Kioskos',
-      description: 'Tablet 10" para consultas',
-      department: 'Recepción',
-      technicalState: 'Operativo',
-      createdAt: new Date('2024-03-10'),
-    },
+   
   ]);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [technicalStates, setTechnicalStates] = useState<TechnicalState[]>([
@@ -134,6 +100,8 @@ export default function App() {
           onViewHistory={() => setCurrentScreen('history')}
           onManageTechnicalStates={() => setCurrentScreen('technical-states')}
           onViewFixedAssets={() => setCurrentScreen('fixed-assets')}
+          onScan={() => setCurrentScreen('scan')}
+          
         />
       )}
 
@@ -175,6 +143,11 @@ export default function App() {
         <AssetHistory
           assets={filteredAssets}
           onBack={() => setCurrentScreen('inventory')}
+        />
+      )}
+
+      {currentScreen === 'scan' && (
+        <ScanPage onBack={() => setCurrentScreen('inventory')}
         />
       )}
     </div>

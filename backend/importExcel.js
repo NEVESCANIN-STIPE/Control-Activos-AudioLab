@@ -28,16 +28,17 @@ const data = xlsx.utils.sheet_to_json(sheet);
 
 console.log("Datos leídos:", data.length);
 console.log("DB:", mongoose.connection.name);
+console.log(data[0]);
 
 // 🔁 MAPEO REAL (según tu Excel)
 const mappedData = data.map((row) => ({
   code: String(row["Activo"] || ""),
-  name: row["Descripcion"] || "",
-  description: row["Caracteristicas"] || "",
-  location: row["Area"] || "",
+  name: String(row["Descripcion"] || ""),
+  description: String(row["Caracteristicas"] || ""),
+  location: String(row["Area"] || ""),
   department: String(row["Edificio"] || ""),
-  serialNumber: row["Número de Serie"] || "",
-  model: row["Modelo"] || "",
+  serialNumber: String(row["Número de Serie"] || ""),
+  model: String(row["Modelo"] || ""),
   technicalState: "Operativo",
 }));
 

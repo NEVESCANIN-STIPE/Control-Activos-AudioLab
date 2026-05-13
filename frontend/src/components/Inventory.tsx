@@ -13,6 +13,7 @@ type InventoryProps = {
   onViewHistory: () => void;
   onManageTechnicalStates: () => void;
   onViewFixedAssets: () => void;
+  onScan: () => void;
 };
 
 export function Inventory({
@@ -25,10 +26,12 @@ export function Inventory({
   onViewHistory,
   onManageTechnicalStates,
   onViewFixedAssets,
+  onScan,
 }: InventoryProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [showBarcodeInput, setShowBarcodeInput] = useState(false);
+  
 
   const filteredAssets = assets.filter(asset =>
     asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -77,7 +80,7 @@ export function Inventory({
         {/* Main Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <button
-            onClick={() => setShowBarcodeInput(!showBarcodeInput)}
+            onClick={onScan}
             className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-all border-2 border-blue-500 flex items-center gap-3"
           >
             <div className="bg-blue-500 p-3 rounded-lg">

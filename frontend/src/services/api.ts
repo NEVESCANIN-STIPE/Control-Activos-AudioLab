@@ -28,7 +28,13 @@ export const updateAsset = async (id: string, data: any) => {
 };
 
 export const deleteAsset = async (id: string) => {
-  await fetch(`${API_URL}/assets/${id}`, {
+  const res = await fetch(`${API_URL}/assets/${id}`, {
     method: "DELETE",
   });
+  return res.json(); // 👈 para confirmar respuesta
+};
+
+export const getAssetByCode = async (code: string) => {
+  const res = await fetch(`http://localhost:3000/assets/code/${code}`);
+  return res.json();
 };
