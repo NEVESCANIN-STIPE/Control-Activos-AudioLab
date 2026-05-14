@@ -18,18 +18,27 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Modelo
 const AssetSchema = new mongoose.Schema({
-  code: String,
+  code: { type: String, required: true },
   name: String,
-  location: String,
-  technician: String,
-  category: String,
   description: String,
-  department: String,
-  technicalState: String,
+  features: String,
+
   serialNumber: String,
   model: String,
-  image: String,
-  createdAt: { type: Date, default: Date.now }
+
+  area: String,
+  building: String,
+
+  category: String, // importante para filtros
+  technicalState: {
+    type: String,
+    default: "Operativo"
+  },
+
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const Asset = mongoose.model("Asset", AssetSchema);

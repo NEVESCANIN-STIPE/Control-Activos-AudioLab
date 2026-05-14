@@ -1,16 +1,17 @@
 export type Asset = {
   id: string;
   code: string;
-  name: string;
-  location: string;
-  technician: string;
-  category: string;
-  image?: string;
   description?: string;
-  department?: string;
+  features?: string;
+  serialNumber?: string;
+  model?: string;
+  area?: string;
+  building?: string;
+  category: string;
   technicalState?: string;
-  createdAt: Date;
+  createdAt: Date;  
 };
+
 
 export type TechnicalState = {
   id: string;

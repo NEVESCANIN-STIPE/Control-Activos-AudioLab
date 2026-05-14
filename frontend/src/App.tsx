@@ -14,15 +14,15 @@ import { ScanPage } from "./pages/ScanPage";
 export type Asset = {
   id: string;
   code: string;
-  name: string;
-  location: string;
-  technician: string;
-  category: string;
-  image?: string;
   description?: string;
-  department?: string;
+  features?: string;
+  serialNumber?: string;
+  model?: string;
+  area?: string;
+  building?: string;
+  category: string;
   technicalState?: string;
-  createdAt: Date;
+  createdAt: Date;  
 };
 
 export type TechnicalState = {
@@ -35,14 +35,42 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'home' | 'inventory' | 'manual-registration' | 'edit-asset' | 'technical-states' | 'fixed-assets' | 'history' | 'scan'>('home');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [assets, setAssets] = useState<Asset[]>([
+      // datos de prueba
    
   ]);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [technicalStates, setTechnicalStates] = useState<TechnicalState[]>([
-    { id: '1', state: 'Operativo', technician: 'Carlos Mendoza' },
-    { id: '2', state: 'En mantenimiento', technician: 'Ana García' },
-    { id: '3', state: 'Fuera de servicio', technician: 'Roberto Silva' },
+    
   ]);
+
+ useEffect(() => {
+  const loadAssets = async () => {
+    try {
+      const data = await getAssets();
+
+      // 🔁 convertir _id → id
+      const mapped = data.map((item: any) => ({
+  id: item._id,
+  code: item.code || "",
+  description: item.description || "",
+  features: item.features || "",
+  serialNumber: item.serialNumber || "",
+  model: item.model || "",
+  area: item.area || "",
+  building: item.building || "",
+  category: item.category || "",
+  technicalState: item.technicalState || "Operativo",
+  createdAt: item.createdAt,
+}));
+
+      setAssets(mapped);
+    } catch (error) {
+      console.error("Error cargando activos:", error);
+    }
+  };
+
+  loadAssets();
+}, []);
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
@@ -79,9 +107,13 @@ export default function App() {
     setTechnicalStates([...technicalStates, newState]);
   };
 
-  const filteredAssets = selectedCategory 
-    ? assets.filter(asset => asset.category === selectedCategory)
-    : assets;
+ const filteredAssets = selectedCategory
+  ? assets.filter(
+      asset =>
+        asset.category?.toLowerCase().trim() ===
+        selectedCategory.toLowerCase().trim()
+    )
+  : assets;
 
   return (
     <div className="min-h-screen bg-gray-50">

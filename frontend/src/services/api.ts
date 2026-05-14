@@ -1,6 +1,8 @@
+import type { Asset } from "../App";
+
 const API_URL = "http://localhost:3000";
 
-export const getAssets = async () => {
+export const getAssets = async (): Promise<Asset[]> => {
   const res = await fetch(`${API_URL}/assets`);
   return res.json();
 };

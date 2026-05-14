@@ -34,9 +34,10 @@ export function Inventory({
   
 
   const filteredAssets = assets.filter(asset =>
-    asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    asset.code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  asset.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  asset.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  asset.area?.toLowerCase().includes(searchTerm.toLowerCase())
+);
 
   const handleDeleteConfirm = () => {
     if (deleteConfirmId) {
@@ -156,10 +157,13 @@ export function Inventory({
             <table className="w-full">
               <thead className="bg-gray-100 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-gray-700">Código</th>
-                  <th className="px-6 py-3 text-left text-gray-700">Nombre</th>
-                  <th className="px-6 py-3 text-left text-gray-700">Localización</th>
-                  <th className="px-6 py-3 text-left text-gray-700">Técnico</th>
+                  <th className="px-6 py-3 text-left text-gray-700">Activo</th>
+                  <th className="px-6 py-3 text-left text-gray-700">Descripcion</th>
+                  <th className="px-6 py-3 text-left text-gray-700">Caracteristicas</th>
+                  <th className="px-6 py-3 text-left text-gray-700">Número de Serie</th>
+                  <th className="px-6 py-3 text-left text-gray-700">Modelo</th>
+                  <th className="px-6 py-3 text-left text-gray-700">Area</th>
+                  <th className="px-6 py-3 text-left text-gray-700">Edificio</th>
                   <th className="px-6 py-3 text-left text-gray-700">Estado</th>
                   <th className="px-6 py-3 text-center text-gray-700">Acciones</th>
                 </tr>
@@ -175,9 +179,12 @@ export function Inventory({
                   filteredAssets.map((asset) => (
                     <tr key={asset.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 text-gray-900">{asset.code}</td>
-                      <td className="px-6 py-4 text-gray-900">{asset.name}</td>
-                      <td className="px-6 py-4 text-gray-600">{asset.location}</td>
-                      <td className="px-6 py-4 text-gray-600">{asset.technician}</td>
+                      <td className="px-6 py-4 text-gray-900">{asset.description}</td>
+                      <td className="px-6 py-4 text-gray-600">{asset.features || "-"}</td>
+                      <td className="px-6 py-4 text-gray-600">{asset.serialNumber || "-"}</td>
+                      <td className="px-6 py-4 text-gray-600">{asset.model || "-"}</td>
+                      <td className="px-6 py-4 text-gray-600">{asset.area || "-"}</td>
+                      <td className="px-6 py-4 text-gray-600">{asset.building || "-"}</td>
                       <td className="px-6 py-4">
                         <span className={`px-3 py-1 rounded-full text-sm ${
                           asset.technicalState === 'Operativo' 
