@@ -1,5 +1,5 @@
 import { ArrowLeft, Search, Settings } from 'lucide-react';
-import type{ Asset, TechnicalState } from '../types';
+import type{ Asset } from '../types';
 
 type FixedAssetsProps = {
   assets: Asset[];

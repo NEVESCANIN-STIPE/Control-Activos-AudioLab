@@ -1,5 +1,5 @@
 import { ArrowLeft, Calendar, User, MapPin } from 'lucide-react';
-import type{ Asset, TechnicalState } from '../types';
+import type{ Asset } from '../types';
 
 type AssetHistoryProps = {
   assets: Asset[];

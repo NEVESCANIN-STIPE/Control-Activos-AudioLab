@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, Search, ScanBarcode, FileEdit, History, Settings, Briefcase, Edit2, Trash2 } from 'lucide-react';
-import type{ Asset, TechnicalState } from '../types';
+import type{ Asset } from '../types';
 import { ConfirmDialog } from './ConfirmDialog';
 
 type InventoryProps = {
@@ -9,7 +9,7 @@ type InventoryProps = {
   onBack: () => void;
   onManualRegistration: () => void;
   onEditAsset: (asset: Asset) => void;
-  onDeleteAsset: (assetId: string) => void;
+  onDeleteAsset: (assetId: string) => Promise<void>;
   onViewHistory: () => void;
   onManageTechnicalStates: () => void;
   onViewFixedAssets: () => void;
@@ -30,8 +30,8 @@ export function Inventory({
 }: InventoryProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [showBarcodeInput, setShowBarcodeInput] = useState(false);
-  
+  const [showBarcodeInput] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const filteredAssets = assets.filter(asset =>
   asset.code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -39,10 +39,14 @@ export function Inventory({
   asset.area?.toLowerCase().includes(searchTerm.toLowerCase())
 );
 
-  const handleDeleteConfirm = () => {
-    if (deleteConfirmId) {
-      onDeleteAsset(deleteConfirmId);
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirmId) return;
+    try {
+      await onDeleteAsset(deleteConfirmId);
       setDeleteConfirmId(null);
+      setDeleteError(null);
+    } catch (err: any) {
+      setDeleteError(err?.message || 'No se pudo eliminar el activo.');
     }
   };
 
@@ -171,7 +175,7 @@ export function Inventory({
               <tbody>
                 {filteredAssets.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
+                    <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
                       No hay activos registrados en esta categoría
                     </td>
                   </tr>
@@ -227,9 +231,9 @@ export function Inventory({
       {deleteConfirmId && (
         <ConfirmDialog
           title="¿Está seguro?"
-          message="¿Desea eliminar este activo? Esta acción no se puede deshacer."
+          message={deleteError || "¿Desea eliminar este activo? Esta acción no se puede deshacer."}
           onConfirm={handleDeleteConfirm}
-          onCancel={() => setDeleteConfirmId(null)}
+          onCancel={() => { setDeleteConfirmId(null); setDeleteError(null); }}
           confirmText="Eliminar"
           cancelText="Cancelar"
           variant="danger"

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Home } from './components/Home';
 import { Inventory } from './components/Inventory';
 import { ManualRegistration } from './components/ManualRegistration';
@@ -6,92 +6,81 @@ import { EditAsset } from './components/EditAsset';
 import { TechnicalStates } from './components/TechnicalStates';
 import { FixedAssets } from './components/FixedAssets';
 import { AssetHistory } from './components/AssetHistory';
-import { useEffect } from "react";
-import { getAssets } from "./services/api";
+import { ScanPage } from './pages/ScanPage';
+import type { Asset, TechnicalState } from './types';
+import {
+  getAssets,
+  createAsset,
+  updateAsset,
+  deleteAsset,
+  getTechnicalStates,
+  createTechnicalState,
+} from './services/api';
 import './styles/globals.css';
-import { ScanPage } from "./pages/ScanPage";
 
-export type Asset = {
-  id: string;
-  code: string;
-  description?: string;
-  features?: string;
-  serialNumber?: string;
-  model?: string;
-  area?: string;
-  building?: string;
-  category: string;
-  technicalState?: string;
-  createdAt: Date;  
-};
+// Nombre exacto de la categoría "Activos Fijos" definida en Home.tsx
+const FIXED_ASSETS_CATEGORY = 'Activos fijos(generales)';
 
-export type TechnicalState = {
-  id: string;
-  state: string;
-  technician: string;
-};
+export type { Asset, TechnicalState };
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'home' | 'inventory' | 'manual-registration' | 'edit-asset' | 'technical-states' | 'fixed-assets' | 'history' | 'scan'>('home');
+  const [currentScreen, setCurrentScreen] = useState<
+    'home' | 'inventory' | 'manual-registration' | 'edit-asset' | 'technical-states' | 'fixed-assets' | 'history' | 'scan'
+  >('home');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [assets, setAssets] = useState<Asset[]>([
-      // datos de prueba
-   
-  ]);
+  const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
-  const [technicalStates, setTechnicalStates] = useState<TechnicalState[]>([
-    
-  ]);
+  const [technicalStates, setTechnicalStates] = useState<TechnicalState[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
- useEffect(() => {
-  const loadAssets = async () => {
-    try {
-      const data = await getAssets();
+  // Carga inicial de activos y estados técnicos desde el backend
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [assetsData, statesData] = await Promise.all([
+          getAssets(),
+          getTechnicalStates(),
+        ]);
+        setAssets(assetsData);
+        setTechnicalStates(statesData);
+      } catch (err) {
+        console.error('Error cargando datos:', err);
+        setError(
+          'No se pudo conectar con el servidor. Verifique que el backend esté corriendo en ' +
+            (import.meta.env.VITE_API_URL || 'http://localhost:3000')
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      // 🔁 convertir _id → id
-      const mapped = data.map((item: any) => ({
-  id: item._id,
-  code: item.code || "",
-  description: item.description || "",
-  features: item.features || "",
-  serialNumber: item.serialNumber || "",
-  model: item.model || "",
-  area: item.area || "",
-  building: item.building || "",
-  category: item.category || "",
-  technicalState: item.technicalState || "Operativo",
-  createdAt: item.createdAt,
-}));
-
-      setAssets(mapped);
-    } catch (error) {
-      console.error("Error cargando activos:", error);
-    }
-  };
-
-  loadAssets();
-}, []);
+    loadData();
+  }, []);
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
     setCurrentScreen('inventory');
   };
 
-  const handleAddAsset = (asset: Omit<Asset, 'id' | 'createdAt'>) => {
-    const newAsset: Asset = {
-      ...asset,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-    };
-    setAssets([...assets, newAsset]);
+  // Crea el activo en el backend y lo agrega al estado local con el id real
+  const handleAddAsset = async (asset: Omit<Asset, 'id' | 'createdAt'>) => {
+    const created = await createAsset(asset);
+    setAssets(prev => [created, ...prev]);
   };
 
-  const handleUpdateAsset = (updatedAsset: Asset) => {
-    setAssets(assets.map(asset => asset.id === updatedAsset.id ? updatedAsset : asset));
+  // Actualiza el activo en el backend y refleja el resultado en el estado local
+  const handleUpdateAsset = async (updatedAsset: Asset) => {
+    const saved = await updateAsset(updatedAsset.id, updatedAsset);
+    setAssets(prev => prev.map(asset => (asset.id === saved.id ? saved : asset)));
   };
 
-  const handleDeleteAsset = (assetId: string) => {
-    setAssets(assets.filter(asset => asset.id !== assetId));
+  // Elimina el activo en el backend y lo quita del estado local
+  const handleDeleteAsset = async (assetId: string) => {
+    await deleteAsset(assetId);
+    setAssets(prev => prev.filter(asset => asset.id !== assetId));
   };
 
   const handleEditAsset = (asset: Asset) => {
@@ -99,31 +88,42 @@ export default function App() {
     setCurrentScreen('edit-asset');
   };
 
-  const handleAddTechnicalState = (state: Omit<TechnicalState, 'id'>) => {
-    const newState: TechnicalState = {
-      ...state,
-      id: Date.now().toString(),
-    };
-    setTechnicalStates([...technicalStates, newState]);
+  // Crea el estado técnico en el backend y lo agrega al catálogo local
+  const handleAddTechnicalState = async (state: Omit<TechnicalState, 'id'>) => {
+    const created = await createTechnicalState(state);
+    setTechnicalStates(prev => [...prev, created]);
   };
 
- const filteredAssets = selectedCategory
-  ? assets.filter(
-      asset =>
-        asset.category?.toLowerCase().trim() ===
-        selectedCategory.toLowerCase().trim()
-    )
-  : assets;
+  const filteredAssets = selectedCategory
+    ? assets.filter(
+        asset =>
+          asset.category?.toLowerCase().trim() === selectedCategory.toLowerCase().trim()
+      )
+    : assets;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-500">Cargando activos...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {error && (
+        <div className="bg-red-100 border-b border-red-300 text-red-700 px-6 py-3 text-sm">
+          {error}
+        </div>
+      )}
+
       {currentScreen === 'home' && (
-        <Home 
+        <Home
           onCategorySelect={handleCategorySelect}
           onScanBarcode={() => setCurrentScreen('scan')}
         />
       )}
-      
+
       {currentScreen === 'inventory' && (
         <Inventory
           category={selectedCategory}
@@ -136,7 +136,6 @@ export default function App() {
           onManageTechnicalStates={() => setCurrentScreen('technical-states')}
           onViewFixedAssets={() => setCurrentScreen('fixed-assets')}
           onScan={() => setCurrentScreen('scan')}
-          
         />
       )}
 
@@ -168,7 +167,7 @@ export default function App() {
 
       {currentScreen === 'fixed-assets' && (
         <FixedAssets
-          assets={assets.filter(asset => asset.category === 'Activos Fijos')}
+          assets={assets.filter(asset => asset.category === FIXED_ASSETS_CATEGORY)}
           onBack={() => setCurrentScreen('inventory')}
           onManageTechnicalStates={() => setCurrentScreen('technical-states')}
         />
@@ -182,8 +181,7 @@ export default function App() {
       )}
 
       {currentScreen === 'scan' && (
-        <ScanPage onBack={() => setCurrentScreen('inventory')}
-        />
+        <ScanPage onBack={() => setCurrentScreen('inventory')} />
       )}
     </div>
   );

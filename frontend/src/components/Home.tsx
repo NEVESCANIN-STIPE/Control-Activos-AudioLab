@@ -1,4 +1,4 @@
-import { Search, Tv, Beaker, MonitorSmartphone, BookOpen, Briefcase, Warehouse, Plus, Building2,       // 👈 agregar
+import { Search, Tv, Beaker, Briefcase, Warehouse, Plus, Building2,
   FlaskConical   } from 'lucide-react';
 //import { BarcodeScanner } from './BarcodeScanner';
 

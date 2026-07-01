@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { ArrowLeft, Plus, Edit2, Trash2 } from 'lucide-react';
-import type{ Asset, TechnicalState } from '../types';
+import type{ TechnicalState } from '../types';
 
 type TechnicalStatesProps = {
   states: TechnicalState[];
   onBack: () => void;
-  onAddState: (state: Omit<TechnicalState, 'id'>) => void;
+  onAddState: (state: Omit<TechnicalState, 'id'>) => Promise<void>;
 };
 
 export function TechnicalStates({ states, onBack, onAddState }: TechnicalStatesProps) {
@@ -14,12 +14,22 @@ export function TechnicalStates({ states, onBack, onAddState }: TechnicalStatesP
     state: '',
     technician: '',
   });
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onAddState(formData);
-    setFormData({ state: '', technician: '' });
-    setShowForm(false);
+    setSubmitting(true);
+    setError(null);
+    try {
+      await onAddState(formData);
+      setFormData({ state: '', technician: '' });
+      setShowForm(false);
+    } catch (err: any) {
+      setError(err?.message || 'No se pudo guardar el estado técnico.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -55,6 +65,11 @@ export function TechnicalStates({ states, onBack, onAddState }: TechnicalStatesP
         {showForm && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 className="text-gray-900 mb-4">Nuevo Estado Técnico</h3>
+            {error && (
+              <div className="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-lg text-sm">
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -89,7 +104,8 @@ export function TechnicalStates({ states, onBack, onAddState }: TechnicalStatesP
               <div className="flex gap-3 mt-4">
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                  disabled={submitting}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Guardar
                 </button>
