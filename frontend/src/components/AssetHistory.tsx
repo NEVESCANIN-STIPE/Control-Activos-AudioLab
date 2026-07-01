@@ -35,7 +35,7 @@ export function AssetHistory({ assets, onBack }: AssetHistoryProps) {
               <div key={asset.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="text-gray-900 mb-1">{asset.name}</h3>
+                    <h3 className="text-gray-900 mb-1">{asset.description}</h3>
                     <p className="text-gray-600">Código: {asset.code}</p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-sm ${
@@ -56,11 +56,11 @@ export function AssetHistory({ assets, onBack }: AssetHistoryProps) {
                   </div>
                   <div className="flex items-center gap-2 text-gray-600">
                     <MapPin className="w-4 h-4" />
-                    <span>{asset.location}</span>
+                    <span>{asset.area}</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-600">
                     <User className="w-4 h-4" />
-                    <span>{asset.technician}</span>
+                    <span>{asset.building}</span>
                   </div>
                 </div>
 

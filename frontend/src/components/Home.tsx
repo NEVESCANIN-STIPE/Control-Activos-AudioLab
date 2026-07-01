@@ -1,11 +1,13 @@
 import { Search, Tv, Beaker, MonitorSmartphone, BookOpen, Briefcase, Warehouse, Plus, Building2,       // 👈 agregar
   FlaskConical   } from 'lucide-react';
+//import { BarcodeScanner } from './BarcodeScanner';
 
 type HomeProps = {
-  onCategorySelect: (category: string) => void;
+  onCategorySelect: (category: string) => void; 
+  onScanBarcode: () => void;
 };
 
-export function Home({ onCategorySelect }: HomeProps) {
+export function Home({ onCategorySelect, onScanBarcode }: HomeProps) {
   const categories = [
     { name: 'Audiovisuales', icon: Tv, color: 'bg-blue-500' },
     { name: 'Almacen-laboratorios', icon: Warehouse, color: 'bg-purple-500' },
@@ -63,7 +65,9 @@ export function Home({ onCategorySelect }: HomeProps) {
             Acciones Rápidas
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <button className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+            <button 
+            onClick={onScanBarcode}
+            className="px-4 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
               Escanear Código de Barras
             </button>
             <button className="px-4 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">

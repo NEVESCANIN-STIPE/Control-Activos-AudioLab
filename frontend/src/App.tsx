@@ -118,7 +118,10 @@ export default function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       {currentScreen === 'home' && (
-        <Home onCategorySelect={handleCategorySelect} />
+        <Home 
+          onCategorySelect={handleCategorySelect}
+          onScanBarcode={() => setCurrentScreen('scan')}
+        />
       )}
       
       {currentScreen === 'inventory' && (
