@@ -107,3 +107,36 @@ export const createTechnicalState = async (
   });
   return normalizeTechnicalState(created);
 };
+
+export const updateTechnicalState = async (
+  id: string,
+  data: Partial<TechnicalState>
+): Promise<TechnicalState> => {
+  const updated = await request(`/technical-states/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+  return normalizeTechnicalState(updated);
+};
+
+export const deleteTechnicalState = async (id: string): Promise<void> => {
+  await request(`/technical-states/${id}`, { method: "DELETE" });
+};
+
+// ---------- Importar / Exportar ----------
+
+export const importAssetsFromJSON = async (
+  rows: Omit<Asset, "id" | "createdAt">[]
+): Promise<{ inserted: number; total: number; message?: string }> => {
+  return request("/assets/import", {
+    method: "POST",
+    body: JSON.stringify(rows),
+  });
+};
+
+export const exportAssetsToJSON = async (
+  category?: string
+): Promise<Record<string, string>[]> => {
+  const qs = category ? `?category=${encodeURIComponent(category)}` : "";
+  return request(`/assets/export${qs}`);
+};

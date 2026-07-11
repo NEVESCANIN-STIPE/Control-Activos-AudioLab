@@ -15,18 +15,17 @@ import {
   deleteAsset,
   getTechnicalStates,
   createTechnicalState,
+  updateTechnicalState,
+  deleteTechnicalState,
 } from './services/api';
 import './styles/globals.css';
 
-// Nombre exacto de la categoría "Activos Fijos" definida en Home.tsx
 const FIXED_ASSETS_CATEGORY = 'Activos fijos(generales)';
 
 export type { Asset, TechnicalState };
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<
-    'home' | 'inventory' | 'manual-registration' | 'edit-asset' | 'technical-states' | 'fixed-assets' | 'history' | 'scan'
-  >('home');
+  const [currentScreen, setCurrentScreen] = useState <'home' | 'inventory' | 'manual-registration' | 'edit-asset' | 'technical-states' | 'fixed-assets' | 'history' | 'scan'>('home');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [assets, setAssets] = useState<Asset[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
@@ -34,7 +33,6 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Carga inicial de activos y estados técnicos desde el backend
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
@@ -56,7 +54,6 @@ export default function App() {
         setLoading(false);
       }
     };
-
     loadData();
   }, []);
 
@@ -65,22 +62,19 @@ export default function App() {
     setCurrentScreen('inventory');
   };
 
-  // Crea el activo en el backend y lo agrega al estado local con el id real
   const handleAddAsset = async (asset: Omit<Asset, 'id' | 'createdAt'>) => {
     const created = await createAsset(asset);
     setAssets(prev => [created, ...prev]);
   };
 
-  // Actualiza el activo en el backend y refleja el resultado en el estado local
   const handleUpdateAsset = async (updatedAsset: Asset) => {
     const saved = await updateAsset(updatedAsset.id, updatedAsset);
-    setAssets(prev => prev.map(asset => (asset.id === saved.id ? saved : asset)));
+    setAssets(prev => prev.map(a => (a.id === saved.id ? saved : a)));
   };
 
-  // Elimina el activo en el backend y lo quita del estado local
   const handleDeleteAsset = async (assetId: string) => {
     await deleteAsset(assetId);
-    setAssets(prev => prev.filter(asset => asset.id !== assetId));
+    setAssets(prev => prev.filter(a => a.id !== assetId));
   };
 
   const handleEditAsset = (asset: Asset) => {
@@ -88,16 +82,24 @@ export default function App() {
     setCurrentScreen('edit-asset');
   };
 
-  // Crea el estado técnico en el backend y lo agrega al catálogo local
   const handleAddTechnicalState = async (state: Omit<TechnicalState, 'id'>) => {
     const created = await createTechnicalState(state);
     setTechnicalStates(prev => [...prev, created]);
   };
 
+  const handleUpdateTechnicalState = async (id: string, state: Omit<TechnicalState, 'id'>) => {
+    const updated = await updateTechnicalState(id, state);
+    setTechnicalStates(prev => prev.map(s => (s.id === updated.id ? updated : s)));
+  };
+
+  const handleDeleteTechnicalState = async (id: string) => {
+    await deleteTechnicalState(id);
+    setTechnicalStates(prev => prev.filter(s => s.id !== id));
+  };
+
   const filteredAssets = selectedCategory
     ? assets.filter(
-        asset =>
-          asset.category?.toLowerCase().trim() === selectedCategory.toLowerCase().trim()
+        a => a.category?.toLowerCase().trim() === selectedCategory.toLowerCase().trim()
       )
     : assets;
 
@@ -162,12 +164,14 @@ export default function App() {
           states={technicalStates}
           onBack={() => setCurrentScreen('inventory')}
           onAddState={handleAddTechnicalState}
+          onUpdateState={handleUpdateTechnicalState}
+          onDeleteState={handleDeleteTechnicalState}
         />
       )}
 
       {currentScreen === 'fixed-assets' && (
         <FixedAssets
-          assets={assets.filter(asset => asset.category === FIXED_ASSETS_CATEGORY)}
+          assets={assets.filter(a => a.category === FIXED_ASSETS_CATEGORY)}
           onBack={() => setCurrentScreen('inventory')}
           onManageTechnicalStates={() => setCurrentScreen('technical-states')}
         />
