@@ -15,7 +15,18 @@ type ImportResult = {
   message?: string;
 };
 
-function mapRowToAsset(row: Record<string, any>, category: string): Omit<Asset, 'id' | 'createdAt'> {
+function detectCategory(area: string): string {
+  const a = area.toUpperCase();
+  if (a.includes('AUDIOVISUAL') || a.includes('AV '))          return 'Audiovisuales';
+  if (a.includes('CEI'))                                         return 'Almacen(CEI)';
+  if (a.includes('LABORATORIO') || a.includes('LAB '))          return 'Laboratorios';
+  if (a.includes('ALMACEN') || a.includes('ALMACÉN'))           return 'Almacen-laboratorios';
+  if (a.includes('OFICINA') || a.includes('CUBICU'))            return 'Oficina Rav-Lab';
+  if (a.includes('CUM') || a.includes('AULA') || a.includes('SALA') || a.includes('BUNKER') || a.includes('BODEGA')) return 'Activos fijos(generales)';
+  return 'Activos fijos(generales)'; // categoría por defecto
+}
+
+function mapRowToAsset(row: Record<string, any>, _category: string): Omit<Asset, 'id' | 'createdAt'> {
   const get = (...keys: string[]) => {
     for (const k of keys) {
       const val = row[k] ?? row[k.toLowerCase()] ?? row[k.toUpperCase()];
@@ -24,16 +35,18 @@ function mapRowToAsset(row: Record<string, any>, category: string): Omit<Asset, 
     return '';
   };
 
+  const area = get('Area', 'Área', 'area', 'AREA');
+
   return {
-    code:          get('Activo', 'Codigo', 'code', 'ACTIVO', 'CÓDIGO', 'Código'),
+    code:          get('Activo', 'Codigo', 'code', 'ACTIVO'),
     description:   get('Descripcion', 'Descripción', 'description', 'DESCRIPCION'),
     features:      get('Caracteristicas', 'Características', 'features', 'CARACTERISTICAS'),
-    serialNumber:  get('Número de Serie', 'N° Serie', 'serialNumber', 'NUMERO DE SERIE', 'NumSerie'),
+    serialNumber:  get('Número de Serie', 'N° Serie', 'serialNumber', 'NUMERO DE SERIE'),
     model:         get('Modelo', 'model', 'MODELO'),
-    area:          get('Area', 'Área', 'area', 'AREA'),
+    area,
     building:      get('Edificio', 'building', 'EDIFICIO'),
-    category:      category || get('Categoria', 'Categoría', 'category') || 'Sin categoría',
-    technicalState: get('Estado Tecnico', 'Estado Técnico', 'technicalState') || 'Operativo',
+    category:      detectCategory(area),
+    technicalState: 'Operativo',
     name:       '',
     location:   '',
     technician: '',
@@ -41,7 +54,6 @@ function mapRowToAsset(row: Record<string, any>, category: string): Omit<Asset, 
     image:      '',
   };
 }
-
 export function ExcelTools({ onClose, category = '' }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);

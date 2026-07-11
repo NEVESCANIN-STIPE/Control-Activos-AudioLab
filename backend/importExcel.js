@@ -74,7 +74,7 @@ function detectCategory(row) {
   }
 
   if (area.includes("oficina")) {
-    return "Oficina Rab-Lav";
+    return "Oficina Rav-Lab";
   }
 
   if (building.includes("cei")) {
